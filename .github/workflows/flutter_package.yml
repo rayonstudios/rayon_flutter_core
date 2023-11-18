@@ -59,6 +59,9 @@ on:
         required: false
         type: string
         default: "!*"
+    secrets:
+      KEYSTORE:
+        required: false
 
 jobs:
   build:
@@ -103,19 +106,20 @@ jobs:
 
       # Here we need to decode keystore.jks from base64 string and place it
       # in the folder specified in the release signing configuration
-      - name: Decode Keystore
+      - name: 🚧 Decode Keystore
         id: decode_keystore
         uses: timheuer/base64-to-file@v1.2
+        env:
+          KEYSTORE: ${{secrets.KEYSTORE}}
         with:
           fileName: "upload-keystore-rayon.jks"
           fileDir: "/home/runner/work/rayon_flutter_core/rayon_flutter_core/android/app/keystore/"
-        env:
-          encodedString: ${{ secrets.KEYSTORE }}
+          encodedString: ${{secrets.KEYSTORE}}
 
       # Build and sign APK ("-x test" argument is used to skip tests)
-      - name: Build APK
+      - name: 🏗️ Build APK
         run: flutter build apk --flavor ${{inputs.build_env}} --target lib/main_${{inputs.build_env}}.dart
         env:
-          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{secrets.SIGNING_KEY_ALIAS}}
+          SIGNING_KEY_PASSWORD: ${{secrets.SIGNING_KEY_PASSWORD}}
+          SIGNING_STORE_PASSWORD: ${{secrets.SIGNING_STORE_PASSWORD}}
