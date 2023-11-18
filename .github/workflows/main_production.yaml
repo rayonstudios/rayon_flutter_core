@@ -13,6 +13,7 @@ jobs:
     uses: ./.github/workflows/flutter_package.yml
     with:
       build_env: production
+      keystore: ${{secrets.KEYSTORE}}
 
   spell-check:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1

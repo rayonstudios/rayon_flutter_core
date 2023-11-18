@@ -60,7 +60,7 @@ on:
         type: string
         default: "!*"
     secrets:
-      KEYSTORE:
+      keystore:
         required: true
 
 jobs:
@@ -112,7 +112,7 @@ jobs:
         with:
           fileName: "upload-keystore-rayon.jks"
           fileDir: "/home/runner/work/rayon_flutter_core/rayon_flutter_core/android/app/keystore/"
-          encodedString: ${{ secrets.KEYSTORE }}
+          encodedString: ${{ secrets.keystore }}
 
       # Build and sign APK ("-x test" argument is used to skip tests)
       - name: Build APK
