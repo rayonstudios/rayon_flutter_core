@@ -59,6 +59,9 @@ on:
         required: false
         type: string
         default: "!*"
+    secrets:
+      KEYSTORE:
+        required: true
 
 jobs:
   build:
