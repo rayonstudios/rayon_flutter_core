@@ -160,7 +160,7 @@ To use the latest translations changes, you will need to generate them:
 flutter gen-l10n --arb-dir="lib/l10n/arb"
 ```
 
-Alternatively, run `flutter run` and code generation will take place automatically.
+Alternatively, run `flutter run` and code generation will take place automatically. 
 
 [flutter_localizations_link]: https://api.flutter.dev/flutter/flutter_localizations/flutter_localizations-library.html
 [internationalization_link]: https://flutter.dev/docs/development/accessibility-and-localization/internationalization
