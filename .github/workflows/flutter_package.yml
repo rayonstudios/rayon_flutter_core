@@ -1,0 +1,120 @@
+name: Flutter Package Workflow
+
+on:
+  workflow_call:
+    inputs:
+      build_env:
+        required: true
+        type: string
+        default: "development"
+      analyze_directories:
+        required: false
+        type: string
+        default: "lib test"
+      concurrency:
+        required: false
+        type: number
+        default: 4
+      coverage_excludes:
+        required: false
+        type: string
+        default: ""
+      flutter_channel:
+        required: false
+        type: string
+        default: "stable"
+      flutter_version:
+        required: false
+        type: string
+        default: ""
+      format_directories:
+        required: false
+        type: string
+        default: "lib test"
+      format_line_length:
+        required: false
+        type: string
+        default: "80"
+      min_coverage:
+        required: false
+        type: number
+        default: 0
+      runs_on:
+        required: false
+        type: string
+        default: "ubuntu-latest"
+      test_optimization:
+        required: false
+        type: boolean
+        default: true
+      test_recursion:
+        required: false
+        type: boolean
+        default: false
+      working_directory:
+        required: false
+        type: string
+        default: "."
+      package_get_excludes:
+        required: false
+        type: string
+        default: "!*"
+
+jobs:
+  build:
+    defaults:
+      run:
+        working-directory: ${{inputs.working_directory}}
+
+    runs-on: ${{inputs.runs_on}}
+
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{inputs.flutter_version}}
+          channel: ${{inputs.flutter_channel}}
+          cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
+
+      - name: 📦 Install Dependencies
+        run: |
+          flutter pub global activate very_good_cli
+          very_good packages get --recursive --ignore=${{inputs.package_get_excludes}}
+
+      - name: ✨ Check Formatting
+        run: dart format --line-length ${{inputs.format_line_length}} --set-exit-if-changed ${{inputs.format_directories}}
+
+      - name: 🕵️ Analyze
+        run: flutter analyze ${{inputs.analyze_directories}}
+
+      - name: 🧪 Run Tests
+        run: very_good test -j ${{inputs.concurrency}} ${{(inputs.test_recursion && '--recursive') || ''}} ${{(inputs.test_optimization && '--optimization') || '--no-optimization'}} --coverage --test-randomize-ordering-seed random
+
+      - name: 📊 Check Code Coverage
+        uses: VeryGoodOpenSource/very_good_coverage@v2
+        with:
+          path: ${{inputs.working_directory}}/coverage/lcov.info
+          exclude: ${{inputs.coverage_excludes}}
+          min_coverage: ${{inputs.min_coverage}}
+
+      # Here we need to decode keystore.jks from base64 string and place it
+      # in the folder specified in the release signing configuration
+      - name: Decode Keystore
+        id: decode_keystore
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: "upload-keystore-rayon.jks"
+          fileDir: "/home/runner/work/rayon_flutter_core/rayon_flutter_core/android/app/keystore/"
+          encodedString: ${{ secrets.KEYSTORE }}
+
+      # Build and sign APK ("-x test" argument is used to skip tests)
+      - name: Build APK
+        run: flutter build apk --flavor ${{inputs.build_env}} --target lib/main_${{inputs.build_env}}.dart
+        env:
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
