@@ -59,9 +59,9 @@ on:
         required: false
         type: string
         default: "!*"
-    # secrets:
-    #   KEYSTORE:
-    #     required: false
+    secrets:
+      KEYSTORE:
+        required: false
 
 jobs:
   build:
@@ -109,12 +109,10 @@ jobs:
       - name: 🚧 Decode Keystore
         id: decode_keystore
         uses: timheuer/base64-to-file@v1.2
-        # env:
-        #   KEYSTORE: ${{secrets.ANDROID_KEYSTORE}}
         with:
           fileName: "upload-keystore-rayon.jks"
           fileDir: "/home/runner/work/rayon_flutter_core/rayon_flutter_core/android/app/keystore/"
-          encodedString: ${{secrets.ANDROID_KEYSTORE}}
+          encodedString: ${{secrets.KEYSTORE}}
 
       # Build and sign APK ("-x test" argument is used to skip tests)
       - name: 🏗️ Build APK
