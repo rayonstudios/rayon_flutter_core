@@ -10,7 +10,7 @@ jobs:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
 
   build:
-    uses: TrendShakers/rayon_flutter_core/.github/workflows/flutter_package.yml@v1
+    uses: TrendShakers/rayon_flutter_core/blob/main/.github/workflows/flutter_package.yml
     with:
       build_env: production
 
