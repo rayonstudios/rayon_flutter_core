@@ -20,7 +20,7 @@ dependencies:
   http: ^1.1.2
   http_interceptor: ^2.0.0-beta.7
   intl: ^0.18.1
-  path_provider: ^2.1.1
+  path_provider: ^2.1.2
 
 dev_dependencies:
   bloc_test: ^9.1.5
